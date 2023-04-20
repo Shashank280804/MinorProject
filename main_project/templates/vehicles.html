@@ -1,0 +1,41 @@
+{% include "header.html" %}
+<div class="veh-div">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-6 left veh-h1">
+        <h1>Vehicle Data</h1>
+      </div>
+      <div class="col-md-6 right">
+        <!-- Right part of the heading here -->
+      </div>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Vehicle ID</th>
+          <th>Type</th>
+          <th>License Plate</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for veh in v_list: %}
+        <tr>
+          <td>{{ veh.rfid }}</td>
+          <td>{{ veh.vehicle_type }}</td>
+          <td>{{ veh.vehicle_plate }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if v_list|length == 0 %}
+    <div class="row">
+      <h2>No Vehicle Added</h2>
+      <a href="#">
+        <button class="btn btn-dark btn-veh btn-large">
+          Add vehicle
+        </button>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>

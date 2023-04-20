@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, request, flash, redirect
 from flask_wtf import FlaskForm
-from flask_login import LoginManager, login_required
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user, UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import StringField, EmailField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length
@@ -24,12 +24,14 @@ def load_user(user_id):
 
 
 # Database configuration
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(80), nullable=False)
     usr_email = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
+    flat_no = db.Column(db.Integer(), nullable=False, unique=True)
+    aadhar_no = db.Column(db.Integer(), nullable=False, unique=True)
 
 
 class Vehicle(db.Model):
@@ -42,9 +44,9 @@ class Vehicle(db.Model):
     vehicle_status = db.Column(db.Boolean, nullable=False)
 
 
-# # Creating database
-# with parking_system.app_context():
-#     db.create_all()
+# Creating database
+with parking_system.app_context():
+    db.create_all()
 
 # Forms
 class Loginform(FlaskForm):
@@ -60,7 +62,9 @@ class Signup(FlaskForm):
     name = StringField("NAME:", validators=[DataRequired(), Length(min=4, max=10)])
     email = EmailField('EMAIL-ID:', validators=[DataRequired()])
     password = PasswordField('SET PASSWORD:', validators=[DataRequired()])
-    signup_button = SubmitField('SIGNUP')
+    flat_no = StringField('FLAT-NO:', validators=[DataRequired()])
+    aadhar_no = StringField('AADHAR CARD-NO:', validators=[DataRequired()])
+    signup = SubmitField('SIGNUP')
 
 
 
@@ -89,35 +93,73 @@ def check_hash(user_hash, password):
 
 @parking_system.route("/")
 def home():
-    return render_template('header.html')
+    return render_template('index.html', user_logged_in=current_user.is_authenticated, v_list=vehicle_list)
 
+
+@parking_system.route("/profile")
+@login_required
+def profile():
+    return render_template("profile.html", user_logged_in=current_user.is_authenticated, u_list=user_list)
+
+
+@parking_system.route("/vehicles")
+@login_required
+def vehicles():
+    return render_template("vehicles.html", user_logged_in=current_user.is_authenticated, v_list=vehicle_list)
 
 @parking_system.route("/login", methods=['GET', 'POST'])
 def login():
-    pass
-    # form = Loginform()
-    # if form.validate_on_submit():
-    #     for user in user_list:
-    #         if user.usr_email == form.email.data:
-    #             if check_hash(user_hash=user.password, form.password.data):
-    #                 login_user(user)
-    #                 return redirect(url_for('home'))
-    #             else:
-    #                 flash('Invalid Password')
+    form = Loginform()
+    val = True
+    if form.validate_on_submit():
+        for user in user_list:
+            if user.usr_email == form.email.data and check_hash(user_hash=user.password, password=form.password.data):
+                    val = True
+                    login_user(user)
+                    return redirect(url_for('home', user_logged_in=current_user.is_authenticated))
+            else:
+                val = False
+        if val == False:
+            flash('Invalid Email-ID or password')
+    else:
+        print("Not validated")
+
+    return render_template("login.html", form=form)
 
 
 @parking_system.route("/signup", methods=['GET','POST'])
 def signup():
-    pass
+    form = Signup()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            hashed_password = hash_password(password=form.password.data)
+            new_user = User(user_name=form.name.data, usr_email=form.email.data, password=hashed_password, flat_no=form.flat_no.data, aadhar_no=form.aadhar_no.data)
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user)
+            return redirect(url_for('home', form = form, user_logged_in=current_user.is_authenticated))
+        else:
+            print("Not validated")
+            print(form.aadhar_no.data)
+    return render_template('signup.html', form=form, user_logged_in=current_user.is_authenticated)
 
 
 @parking_system.route("/logout")
 @login_required
 def logout():
-    pass
+    logout_user()
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':
     # print(vehicle_list[0].vehicle_status)
     with parking_system.app_context():
         parking_system.run(debug=True)
+
+# TO DO:
+## Add vehicle form
+## Edit profile form
+## nav link - active link js code
+## Connect arduino to database
+## Remove 'profile' title from web page
+## Design analytics page.
