@@ -17,6 +17,25 @@ db = SQLAlchemy()  # Create database object.
 parking_system.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///system.db"  # Set database path.
 db.init_app(parking_system)  # Initialize the database.
 
+
+# Database configuration
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    user_name = db.Column(db.String(80), nullable=False)
+    usr_email = db.Column(db.String(80), nullable=False, unique=True)
+    password = db.Column(db.String(80), nullable=False)
+
+
+class Vehicle(db.Model):
+    __tablename__ ='vehicles'
+    rfid = db.Column(db.Integer, primary_key=True)
+    vehicle_name = db.Column(db.String(80), nullable=False)
+    vehicle_type = db.Column(db.String(80), nullable=False)
+    vehicle_plate = db.Column(db.String(80), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    owner = db.relationship("User", backref="vehicles")
+    vehicle_status = db.Column(db.Boolean, nullable=False)
 # Forms
 class Loginform(FlaskForm):
     """This class creates a login form."""
