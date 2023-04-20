@@ -13,9 +13,13 @@ login_manager.init_app(parking_system)  # Initialize the login manager.
 parking_system.secret_key = "yi5u9yh4gn"
 csrf_token = "vaow457y34bvjr"
 
-db = SQLAlchemy()  # Create database object.
 parking_system.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///system.db"  # Set database path.
-db.init_app(parking_system)  # Initialize the database.
+db = SQLAlchemy(parking_system)  # Create database object.
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 # Database configuration
@@ -33,9 +37,12 @@ class Vehicle(db.Model):
     vehicle_name = db.Column(db.String(80), nullable=False)
     vehicle_type = db.Column(db.String(80), nullable=False)
     vehicle_plate = db.Column(db.String(80), nullable=False)
-    owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    owner = db.relationship("User", backref="vehicles")
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     vehicle_status = db.Column(db.Boolean, nullable=False)
+
+with parking_system.app_context():
+    db.create_all()
+
 # Forms
 class Loginform(FlaskForm):
     """This class creates a login form."""
@@ -51,3 +58,12 @@ class Signup(FlaskForm):
     email = EmailField('EMAIL-ID:', validators=[DataRequired()])
     password = PasswordField('SET PASSWORD:', validators=[DataRequired()])
     signup_button = SubmitField('SIGNUP')
+
+
+@parking_system.route("/")
+def home():
+    return render_template('header.html')
+
+
+if __name__ == '__main__':
+    parking_system.run(debug=True)
