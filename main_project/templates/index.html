@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- bootstrap styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <!--Font awesome-->
+    <script src="https://kit.fontawesome.com/00a5c407e7.js" crossorigin="anonymous"></script>
+    <!--Style sheet-->
+    <link rel="stylesheet" href="..\static\styles\style.css">
+    
+    <title>Smart Parking System</title>
+</head>
+<body>
+    <!--Navigation and side bar-->
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <img src="../static/images/smart-modified.png" height="80px" width="80px" alt="">
+            <a class="navbar-brand" href="#"><h1>Smart Parking System</h1></a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel"><h2>Profile</h2></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><h4><i class="fa-solid fa-user"></i> Account</h4></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#"><h4><i class="fa-solid fa-house-user"></i> Dashboard</h4></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><h4><i class="fa-solid fa-car"></i> Vehicles</h4></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><h4><i class="fa-solid fa-chart-simple"></i> Analytics</h4></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><h4><i class="fa-solid fa-right-from-bracket"></i> Logout</h4></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            </div>
+      </nav>
+
+    <!-- Main content area -->
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <!-- Side bar with vehicle status -->
+<!-- Main content section -->
+<main class="container-fluid mt-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <h2 class="text-center mb-4">Parking Status</h2>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Vehicle Owner</th>
+                            <th scope="col">Vehicle Plate Number</th>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Vehicle Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>ABC 123</td>
+                            <td>123-456-7890</td>
+                            <td><span class="badge bg-success">Parked</span></td>
+                        </tr>
+                        <tr>
+                            <td>Jane Doe</td>
+                            <td>XYZ 789</td>
+                            <td>555-555-5555</td>
+                            <td><span class="badge bg-warning text-dark">Leaving Soon</span></td>
+                        </tr>
+                        <tr>
+                            <td>Bob Smith</td>
+                            <td>DEF 456</td>
+                            <td>555-123-4567</td>
+                            <td><span class="badge bg-danger">Not Parked</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer section -->
+<footer class="bg-dark text-center text-white py-3">
+    <p class="mb-0">&copy; 2023 Smart Parking System</p>
+</footer>
+ <!--- Bootstrap js script-->
+ <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+</body>
+</html>
