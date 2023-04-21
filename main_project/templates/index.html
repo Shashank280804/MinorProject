@@ -17,6 +17,7 @@
                                     <tr>
                                         <th scope="col">Vehicle Plate Number</th>
                                         <th scope="col">Vehicle Status</th>
+                                        <th scope="col">Time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -25,9 +26,9 @@
                                     <tr>
                                         <td>{{ vehicle.vehicle_plate }}</td>
                                         {% if vehicle.vehicle_status == True: %}
-                                        <td><span class="badge bg-success">{{ vehicle.vehicle_status }}</span></td>
+                                        <td><span class="badge bg-success">In</span></td>
                                         {% else: %}
-                                        <td><span class="badge bg-danger">{{ vehicle.vehicle_status }}</span></td>
+                                        <td><span class="badge bg-danger">Out</span></td>
                                         {% endif %}
                                     </tr>
                                     {% endif %}

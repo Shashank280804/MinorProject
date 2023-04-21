@@ -49,11 +49,12 @@ class Vehicle(db.Model):
     vehicle_plate = db.Column(db.String(80), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     vehicle_status = db.Column(db.Boolean, nullable=False)
+    v_time = db.Column(db.DateTime, nullable=False)
 
 
-# # Creating database
-# with parking_system.app_context():
-#     db.create_all()
+# Creating database
+with parking_system.app_context():
+    db.create_all()
 
 # Forms
 ## Login Form
