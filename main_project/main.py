@@ -1,3 +1,4 @@
+# Imports
 from flask import Flask, render_template, url_for, request, flash, redirect
 from flask_wtf import FlaskForm
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user, UserMixin
@@ -6,18 +7,24 @@ from wtforms import StringField, EmailField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length
 from werkzeug import security as s
 
+
 parking_system = Flask(__name__) # Application initialization.
+
 
 login_manager = LoginManager()  # Login manager to add authentication functionality.
 login_manager.init_app(parking_system)  # Initialize the login manager.
 
+
+# Keys:
 parking_system.secret_key = "yi5u9yh4gn"
 csrf_token = "vaow457y34bvjr"
+
 
 parking_system.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///system.db"  # Set database path.
 db = SQLAlchemy(parking_system)  # Create database object.
 
 
+# User loader.
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -44,11 +51,12 @@ class Vehicle(db.Model):
     vehicle_status = db.Column(db.Boolean, nullable=False)
 
 
-# Creating database
-with parking_system.app_context():
-    db.create_all()
+# # Creating database
+# with parking_system.app_context():
+#     db.create_all()
 
 # Forms
+## Login Form
 class Loginform(FlaskForm):
     """This class creates a login form."""
     email = EmailField('EMAIL-ID:', validators=[DataRequired()])
@@ -56,7 +64,7 @@ class Loginform(FlaskForm):
     login = SubmitField('LOGIN')
 
 
-#   Signup Form -
+## Signup Form -
 class Signup(FlaskForm):
     """This class creates a signup form."""
     name = StringField("NAME:", validators=[DataRequired(), Length(min=4, max=10)])
@@ -67,12 +75,33 @@ class Signup(FlaskForm):
     signup = SubmitField('SIGNUP')
 
 
+## Vehicle Form - 
+class VehicleForm(FlaskForm):
+    """This class creates a vehicle form"""
+    vehicle_name = StringField("VEHICLE NAME:", validators=[DataRequired(), Length(min=4, max=10)])
+    vehicle_type = StringField("VEHICLE TYPE:", validators=[DataRequired(), Length(min=4, max=10)])
+    vehicle_plate = StringField("VEHICLE PLATE:", validators=[DataRequired(), Length(min=4, max=10)])
+    add_veh = SubmitField('Add Vehicle')
 
+
+## Profile Form -
+class ProfileForm(FlaskForm):
+    """This class represents profile form."""
+    name = StringField("NAME:", validators=[DataRequired(), Length(min=4, max=10)])
+    email = EmailField('EMAIL-ID:', validators=[DataRequired()])
+    flat_no = StringField('Flat Number:', validators=[DataRequired()])
+    aadhar_no = StringField('Aadhar Card Number:', validators=[DataRequired()])
+    save_prof = StringField('Save Profile')
+
+    
+
+# Application context:
 with parking_system.app_context():
-    vehicle_list = Vehicle.query.all()  # Get all vehicle information
-    user_list = User.query.all()
+    vehicle_list = Vehicle.query.all()  # Get all vehicle information from table.
+    user_list = User.query.all()  # Get all user information from table.
 
 
+# Storing csrf token in application.
 parking_system.config['SECRET_KEY'] = csrf_token
 
 
@@ -90,6 +119,8 @@ def check_hash(user_hash, password):
     check = s.check_password_hash(user_hash, password)
     return check
 
+
+# Routes:
 
 @parking_system.route("/")
 def home():

@@ -10,10 +10,10 @@
               {% for user in u_list: %}
               {% if user.id == current_user.id %}
               <h5 class="card-title">{{ user.name }}</h5>
-              <p class="card-text">Email: {{ user.mail }}</p>
+              <p class="card-text">Email: {{ user.usr_email }}</p>
               <p class="card-text">Aadhar card number: {{ user.aadhar_no }}</p>
               <p class="card-text">Flat number: {{ user.flat_no }}</p>
-              <a href="#" class="btn btn-primary">Edit Profile</a>
+              <a href="#" class="btn btn-dark">Edit Profile</a>
               {% endif %}
               {% endfor %}
             </div>
@@ -21,3 +21,5 @@
         </div>
       </div>
     </div>
+
+{% include "footer.html" %}
