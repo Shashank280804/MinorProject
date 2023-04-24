@@ -3,7 +3,7 @@
     <div class="header">
       <h1>Vehicle Details</h1>
     </div>
-    <form method="post">
+    <form method="post" action="vehicle-registration">
       {{ form.csrf_token }}
       <div class="form-group">
         {{ form.vehicle_name.label }}
@@ -15,15 +15,15 @@
       </div>
       <div class="form-group">
         {{ form.vehicle_type.label }}
-        <select class="form-control" id="vehicle-type" method="post">
-          {% for wheeler in wheels: %}
-          <option value="{{ wheeler }}">{{ wheeler }}</option>
-          {% endfor %}
-        </select> 
+        {{ form.vehicle_type(class="form-control") }}
       </div>
       <div class="form-group">
         {{ form.rfid_no.label }}
         {{ form.rfid_no(class="form-control", placeholder="Enter given RFID tag number.") }}
+      </div>
+      <div class="form-group">
+        {{ form.status.label }}
+        {{ form.status(class="form-control", placeholder="Current status of the vehicle.") }}
       </div>
       {{ form.add_veh(class="btn btn-dark btn-large sub-btn") }}
     </form>
