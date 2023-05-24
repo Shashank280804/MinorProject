@@ -20,24 +20,23 @@
       <tbody>
         {% for veh in v_list: %}
         <tr>
-          <td>{{ veh.rfid }}</td>
+          <td>{{ veh.rfid_no }}</td>
           <td>{{ veh.vehicle_type }}</td>
           <td>{{ veh.vehicle_plate }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-    {% if v_list|length == 0 %}
     <div class="row">
+      {% if v_list|length == 0 %}
       <h2>No Vehicle Added</h2>
+      {% endif %}
       <a href="{{ url_for('vehicle_registration') }}">
         <button class="btn btn-dark btn-veh btn-large">
           Add vehicle
         </button>
       </a>
     </div>
-    {% endif %}
   </div>
 </div>
 
-{% include "footer.html" %}

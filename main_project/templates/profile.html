@@ -13,7 +13,7 @@
               <p class="card-text">Email: {{ user.usr_email }}</p>
               <p class="card-text">Aadhar card number: {{ user.aadhar_no }}</p>
               <p class="card-text">Flat number: {{ user.flat_no }}</p>
-              <a href="#" class="btn btn-dark">Edit Profile</a>
+              <a href="{{ url_for('edit_prof') }}" class="btn btn-dark">Edit Profile</a>
               {% endif %}
               {% endfor %}
             </div>
@@ -21,5 +21,3 @@
         </div>
       </div>
     </div>
-
-{% include "footer.html" %}

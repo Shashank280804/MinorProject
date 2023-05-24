@@ -1,9 +1,13 @@
 # Imports
-from flask import Flask, render_template, url_for, request, flash, redirect
-from flask_wtf import FlaskForm
+#This is trial.
+#This is trail 2.
+                         #libraries
+                         #load html pages                  Display messages on html
+from flask import Flask, render_template, url_for, request, flash, redirect  # Web development
+from flask_wtf import FlaskForm  
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user, UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from wtforms import StringField, EmailField, PasswordField, SubmitField
+from wtforms import StringField, EmailField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length
 from werkzeug import security as s
 
@@ -35,8 +39,6 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(80), nullable=False)
-    f_name = db.Column(db.String(80), nullable=False)
-    l_name = db.Column(db.String(80), nullable=False)
     usr_email = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     flat_no = db.Column(db.Integer(), nullable=False, unique=True)
@@ -46,7 +48,7 @@ class User(db.Model, UserMixin):
 
 class Vehicle(db.Model):
     __tablename__ ='vehicles'
-    rfid = db.Column(db.Integer, primary_key=True)
+    rfid_no = db.Column(db.Integer, primary_key=True)
     vehicle_name = db.Column(db.String(80), nullable=False)
     vehicle_type = db.Column(db.String(80), nullable=False)
     vehicle_plate = db.Column(db.String(80), nullable=False)
@@ -75,8 +77,6 @@ class Loginform(FlaskForm):
 ## Signup Form -
 class Signup(FlaskForm):
     """This class creates a signup form."""
-    f_name = StringField("First Name:", validators=[DataRequired(), Length(min=4, max=10)])
-    l_name = StringField("Last Name:", validators=[DataRequired(), Length(min=4, max=10)])
     user_name = StringField("User Name:", validators=[DataRequired(),Length(min=4, max=10)])
     email = EmailField('EMAIL-ID:', validators=[DataRequired()])
     password = PasswordField('SET PASSWORD:', validators=[DataRequired()])
@@ -90,20 +90,11 @@ class Signup(FlaskForm):
 class VehicleForm(FlaskForm):
     """This class creates a vehicle form"""
     vehicle_name = StringField("VEHICLE NAME:", validators=[DataRequired(), Length(min=2, max=10)])
-    vehicle_type = StringField("VEHICLE TYPE:", validators=[DataRequired(), Length(min=4, max=10)])
+    vehicle_type = SelectField("Vehicle Type", validators=[DataRequired()], choices=['2-wheeler', '3-wheeler', '4-wheeler'])  # Dropdown
     vehicle_plate = StringField("VEHICLE PLATE NUMBER:", validators=[DataRequired(), Length(min=4, max=10)])
     rfid_no = StringField("RFID NO:", validators=[DataRequired()])
+    status = SelectField("Is vehicle currently in?:", validators=[DataRequired()], choices=['IN', 'OUT'])
     add_veh = SubmitField('Add Vehicle')
-
-
-## Profile Form -
-class ProfileForm(FlaskForm):
-    """This class represents profile form."""
-    name = StringField("NAME:", validators=[DataRequired(), Length(min=4, max=10)])
-    email = EmailField('EMAIL-ID:', validators=[DataRequired()])
-    flat_no = StringField('Flat Number:', validators=[DataRequired()])
-    aadhar_no = StringField('Aadhar Card Number:', validators=[DataRequired()])
-    save_prof = StringField('Save Profile')
 
 
 ## Wheel info
@@ -112,6 +103,14 @@ class vech_type(FlaskForm):
     id = StringField('Id:', validators=[DataRequired()])
     type = StringField('Type:', validators=[DataRequired()])
 
+
+## Profile Form
+class ProfileForm(FlaskForm):
+    """This class represents profile form."""
+    flat_no = StringField('Flat No:', validators=[DataRequired()])
+    aadhar_no = StringField('Aadhar No:', validators=[DataRequired()])
+    phn_no = StringField('Phone No:', validators=[DataRequired()])
+    update = SubmitField('Update')
 
 # Application context:
 with parking_system.app_context():
@@ -185,7 +184,7 @@ def signup():
     if request.method == 'POST':
         if form.validate_on_submit():
             hashed_password = hash_password(password=form.password.data)
-            new_user = User(f_name=form.f_name.data, l_name=form.l_name.data, user_name=form.user_name.data, usr_email=form.email.data, password=hashed_password, flat_no=form.flat_no.data, aadhar_no=form.aadhar_no.data, phone_no=form.phn_number.data)
+            new_user = User(user_name=form.user_name.data, usr_email=form.email.data, password=hashed_password, flat_no=form.flat_no.data, aadhar_no=form.aadhar_no.data, phone_no=form.phn_number.data)
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
@@ -206,29 +205,45 @@ def logout():
 @login_required
 def vehicle_registration():
     form = VehicleForm()
-    wh = ["2-wheeler", "3-wheeler", "4-wheeler"]
     if request.method == 'POST':
         if form.validate_on_submit():
-            new_vehicle = Vehicle(vehicle_name=form.vehicle_name.data, vehicle_type=form.vehicle_type.data, vehicle_plate=form.vehicle_plate.data, rfid_no=form.rfid_no.data)
+
+            if form.status.data == 'IN':
+                st = True
+            else:
+                st = False
+
+            new_vehicle = Vehicle(vehicle_name=form.vehicle_name.data, vehicle_type=form.vehicle_type.data, vehicle_plate=form.vehicle_plate.data, rfid_no=form.rfid_no.data, vehicle_status=st, owner_id=current_user.id)
             db.session.add(new_vehicle)
             db.session.commit()
-            vehicle_list = Vehicle.query.all()  # Get all vehicle information from table.
-            return redirect(url_for('home', user_logged_in=current_user.is_authenticated, v_list=vehicle_list))
+            vehicle_list = Vehicle.query.all()  # Get all vehicle information from table.   
+            return redirect(url_for('vehicles', user_logged_in=current_user.is_authenticated, v_list=vehicle_list))
         else:
             print(form.vehicle_type.data)
             print("Not validated")
-    return render_template("vehicle_details.html", form=form, user_logged_in=current_user.is_authenticated, wheels=wh)
+    return render_template("vehicle_details.html", form=form, user_logged_in=current_user.is_authenticated)
+
+
+@parking_system.route("/edit-profile", methods=['GET','POST'])
+@login_required
+def edit_prof():
+    form = ProfileForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            usr_rec = User.query.get_or_404(current_user.id)
+            usr_rec.flat_no = form.flat_no.data
+            usr_rec.phn_no = form.phn_no.data
+            usr_rec.aadhar_no = form.aadhar_no.data
+            db.session.commit()
+            user_list = User.query.all()  # Refresh database
+            return redirect(url_for('profile', user_logged_in=current_user.is_authenticated, u_list=user_list))
+        else:
+            print("Not validated")
+    return render_template("edit_prof.html", form=form, user_logged_in=current_user.is_authenticated)
+
 
 
 if __name__ == '__main__':
     # print(vehicle_list[0].vehicle_status)
     with parking_system.app_context():
         parking_system.run(debug=True)
-
-# TO DO:
-## Add vehicle form
-## Edit profile form
-## nav link - active link js code
-## Connect arduino to database
-## Remove 'profile' title from web page
-## Design analytics page.
