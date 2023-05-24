@@ -35,10 +35,13 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(80), nullable=False)
+    f_name = db.Column(db.String(80), nullable=False)
+    l_name = db.Column(db.String(80), nullable=False)
     usr_email = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     flat_no = db.Column(db.Integer(), nullable=False, unique=True)
     aadhar_no = db.Column(db.Integer(), nullable=False, unique=True)
+    phone_no = db.Column(db.Integer(), nullable=False, unique=True)
 
 
 class Vehicle(db.Model):
@@ -49,7 +52,11 @@ class Vehicle(db.Model):
     vehicle_plate = db.Column(db.String(80), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     vehicle_status = db.Column(db.Boolean, nullable=False)
-    v_time = db.Column(db.DateTime, nullable=False)
+    # v_time = db.Column(db.DateTime, nullable=False)
+
+class Vech_Wheel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    wheel_no = db.Column(db.Integer, nullable=False)
 
 
 # Creating database
@@ -68,20 +75,24 @@ class Loginform(FlaskForm):
 ## Signup Form -
 class Signup(FlaskForm):
     """This class creates a signup form."""
-    name = StringField("NAME:", validators=[DataRequired(), Length(min=4, max=10)])
+    f_name = StringField("First Name:", validators=[DataRequired(), Length(min=4, max=10)])
+    l_name = StringField("Last Name:", validators=[DataRequired(), Length(min=4, max=10)])
+    user_name = StringField("User Name:", validators=[DataRequired(),Length(min=4, max=10)])
     email = EmailField('EMAIL-ID:', validators=[DataRequired()])
     password = PasswordField('SET PASSWORD:', validators=[DataRequired()])
     flat_no = StringField('FLAT-NO:', validators=[DataRequired()])
     aadhar_no = StringField('AADHAR CARD-NO:', validators=[DataRequired()])
+    phn_number = StringField('MOBIE NUMBER:', validators=[DataRequired()])
     signup = SubmitField('SIGNUP')
 
 
 ## Vehicle Form - 
 class VehicleForm(FlaskForm):
     """This class creates a vehicle form"""
-    vehicle_name = StringField("VEHICLE NAME:", validators=[DataRequired(), Length(min=4, max=10)])
+    vehicle_name = StringField("VEHICLE NAME:", validators=[DataRequired(), Length(min=2, max=10)])
     vehicle_type = StringField("VEHICLE TYPE:", validators=[DataRequired(), Length(min=4, max=10)])
-    vehicle_plate = StringField("VEHICLE PLATE:", validators=[DataRequired(), Length(min=4, max=10)])
+    vehicle_plate = StringField("VEHICLE PLATE NUMBER:", validators=[DataRequired(), Length(min=4, max=10)])
+    rfid_no = StringField("RFID NO:", validators=[DataRequired()])
     add_veh = SubmitField('Add Vehicle')
 
 
@@ -94,7 +105,13 @@ class ProfileForm(FlaskForm):
     aadhar_no = StringField('Aadhar Card Number:', validators=[DataRequired()])
     save_prof = StringField('Save Profile')
 
-    
+
+## Wheel info
+class vech_type(FlaskForm):
+    """This class represents vehicle type form."""
+    id = StringField('Id:', validators=[DataRequired()])
+    type = StringField('Type:', validators=[DataRequired()])
+
 
 # Application context:
 with parking_system.app_context():
@@ -125,18 +142,21 @@ def check_hash(user_hash, password):
 
 @parking_system.route("/")
 def home():
+    vehicle_list = Vehicle.query.all()  # Get all vehicle information from table.
     return render_template('index.html', user_logged_in=current_user.is_authenticated, v_list=vehicle_list)
 
 
 @parking_system.route("/profile")
 @login_required
 def profile():
+    user_list = User.query.all()  # Get all user information from table.
     return render_template("profile.html", user_logged_in=current_user.is_authenticated, u_list=user_list)
 
 
 @parking_system.route("/vehicles")
 @login_required
 def vehicles():
+    vehicle_list = Vehicle.query.all()  # Get all vehicle information from table.
     return render_template("vehicles.html", user_logged_in=current_user.is_authenticated, v_list=vehicle_list)
 
 @parking_system.route("/login", methods=['GET', 'POST'])
@@ -165,14 +185,13 @@ def signup():
     if request.method == 'POST':
         if form.validate_on_submit():
             hashed_password = hash_password(password=form.password.data)
-            new_user = User(user_name=form.name.data, usr_email=form.email.data, password=hashed_password, flat_no=form.flat_no.data, aadhar_no=form.aadhar_no.data)
+            new_user = User(f_name=form.f_name.data, l_name=form.l_name.data, user_name=form.user_name.data, usr_email=form.email.data, password=hashed_password, flat_no=form.flat_no.data, aadhar_no=form.aadhar_no.data, phone_no=form.phn_number.data)
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
-            return redirect(url_for('home', form = form, user_logged_in=current_user.is_authenticated))
+            return redirect(url_for('home', form=form, user_logged_in=current_user.is_authenticated))
         else:
             print("Not validated")
-            print(form.aadhar_no.data)
     return render_template('signup.html', form=form, user_logged_in=current_user.is_authenticated)
 
 
@@ -181,6 +200,24 @@ def signup():
 def logout():
     logout_user()
     return redirect(url_for('home'))
+
+
+@parking_system.route("/vehicle-registration", methods=['GET','POST'])
+@login_required
+def vehicle_registration():
+    form = VehicleForm()
+    wh = ["2-wheeler", "3-wheeler", "4-wheeler"]
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            new_vehicle = Vehicle(vehicle_name=form.vehicle_name.data, vehicle_type=form.vehicle_type.data, vehicle_plate=form.vehicle_plate.data, rfid_no=form.rfid_no.data)
+            db.session.add(new_vehicle)
+            db.session.commit()
+            vehicle_list = Vehicle.query.all()  # Get all vehicle information from table.
+            return redirect(url_for('home', user_logged_in=current_user.is_authenticated, v_list=vehicle_list))
+        else:
+            print(form.vehicle_type.data)
+            print("Not validated")
+    return render_template("vehicle_details.html", form=form, user_logged_in=current_user.is_authenticated, wheels=wh)
 
 
 if __name__ == '__main__':
