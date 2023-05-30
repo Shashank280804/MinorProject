@@ -1,8 +1,10 @@
 # Imports
 #This is trial.
 #This is trail 2.
-from flask import Flask, render_template, url_for, request, flash, redirect
-from flask_wtf import FlaskForm
+                         #libraries
+                         #load html pages                  Display messages on html
+from flask import Flask, render_template, url_for, request, flash, redirect  # Web development
+from flask_wtf import FlaskForm  
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user, UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import StringField, EmailField, PasswordField, SubmitField, SelectField
@@ -37,8 +39,6 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(80), nullable=False)
-    f_name = db.Column(db.String(80), nullable=False)
-    l_name = db.Column(db.String(80), nullable=False)
     usr_email = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     flat_no = db.Column(db.Integer(), nullable=False, unique=True)
@@ -77,8 +77,6 @@ class Loginform(FlaskForm):
 ## Signup Form -
 class Signup(FlaskForm):
     """This class creates a signup form."""
-    f_name = StringField("First Name:", validators=[DataRequired(), Length(min=4, max=10)])
-    l_name = StringField("Last Name:", validators=[DataRequired(), Length(min=4, max=10)])
     user_name = StringField("User Name:", validators=[DataRequired(),Length(min=4, max=10)])
     email = EmailField('EMAIL-ID:', validators=[DataRequired()])
     password = PasswordField('SET PASSWORD:', validators=[DataRequired()])
@@ -92,7 +90,7 @@ class Signup(FlaskForm):
 class VehicleForm(FlaskForm):
     """This class creates a vehicle form"""
     vehicle_name = StringField("VEHICLE NAME:", validators=[DataRequired(), Length(min=2, max=10)])
-    vehicle_type = SelectField("Vehicle Type", validators=[DataRequired()], choices=['2-wheeler', '3-wheeler', '4-wheeler'])
+    vehicle_type = SelectField("Vehicle Type", validators=[DataRequired()], choices=['2-wheeler', '3-wheeler', '4-wheeler'])  # Dropdown
     vehicle_plate = StringField("VEHICLE PLATE NUMBER:", validators=[DataRequired(), Length(min=4, max=10)])
     rfid_no = StringField("RFID NO:", validators=[DataRequired()])
     status = SelectField("Is vehicle currently in?:", validators=[DataRequired()], choices=['IN', 'OUT'])
@@ -109,11 +107,9 @@ class vech_type(FlaskForm):
 ## Profile Form
 class ProfileForm(FlaskForm):
     """This class represents profile form."""
-    f_name = StringField('First Name:', validators=[DataRequired()])
-    l_name = StringField('Last Name:', validators=[DataRequired()])
     flat_no = StringField('Flat No:', validators=[DataRequired()])
-    aadhar_no = StringField('AADhar No:', validators=[DataRequired()])
-    phn_no = StringField('Phn No:', validators=[DataRequired()])
+    aadhar_no = StringField('Aadhar No:', validators=[DataRequired()])
+    phn_no = StringField('Phone No:', validators=[DataRequired()])
     update = SubmitField('Update')
 
 # Application context:
@@ -188,7 +184,7 @@ def signup():
     if request.method == 'POST':
         if form.validate_on_submit():
             hashed_password = hash_password(password=form.password.data)
-            new_user = User(f_name=form.f_name.data, l_name=form.l_name.data, user_name=form.user_name.data, usr_email=form.email.data, password=hashed_password, flat_no=form.flat_no.data, aadhar_no=form.aadhar_no.data, phone_no=form.phn_number.data)
+            new_user = User(user_name=form.user_name.data, usr_email=form.email.data, password=hashed_password, flat_no=form.flat_no.data, aadhar_no=form.aadhar_no.data, phone_no=form.phn_number.data)
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
@@ -235,13 +231,11 @@ def edit_prof():
     if request.method == 'POST':
         if form.validate_on_submit():
             usr_rec = User.query.get_or_404(current_user.id)
-            usr_rec.f_name = form.f_name.data
-            usr_rec.l_name = form.f_name.data
             usr_rec.flat_no = form.flat_no.data
             usr_rec.phn_no = form.phn_no.data
             usr_rec.aadhar_no = form.aadhar_no.data
             db.session.commit()
-            user_list = User.query.all()
+            user_list = User.query.all()  # Refresh database
             return redirect(url_for('profile', user_logged_in=current_user.is_authenticated, u_list=user_list))
         else:
             print("Not validated")

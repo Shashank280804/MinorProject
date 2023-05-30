@@ -5,6 +5,7 @@
       <div class="col-md-4 text-center text-white">
         <h1 class="mb-4">Signup</h1>
         <p class="lead">Access your vehicle status</p>
+        <img src="" alt="">
       </div>
     </div>
   </div>
@@ -15,14 +16,6 @@
           <div class="card-body">
             <form method="post">
               {{ form.csrf_token }}
-              <div class="form-group">
-                {{ form.f_name.label }}
-                {{ form.f_name(class="data-box form-control", placeholder="Enter First Name") }}
-              </div>
-              <div class="form-group">
-                {{ form.l_name.label }}
-                {{ form.l_name(class="data-box form-control", placeholder="Enter Last Name") }}
-              </div>
               <div class="form-group">
                 {{ form.user_name.label }}
                 {{ form.user_name(class="data-box form-control", placeholder="Enter your Username") }}

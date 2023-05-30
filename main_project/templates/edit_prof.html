@@ -7,14 +7,6 @@
               <form method="post">
                 {{ form.csrf_token }}
                 <div class="form-group">
-                  {{ form.f_name.label }}
-                  {{ form.f_name(class="form-control", placeholder="Enter First Name") }}
-                </div>
-                <div class="form-group">
-                  {{ form.l_name.label }}
-                  {{ form.l_name(class="form-control", placeholder="Enter Last Name") }}
-                </div>
-                <div class="form-group">
                   {{ form.flat_no.label }}
                   {{ form.flat_no(class="form-control", placeholder="Enter Flat Number") }}
                   </div>
@@ -34,4 +26,3 @@
       </div>
     </div>
 
-  {% include "footer.html" %}
