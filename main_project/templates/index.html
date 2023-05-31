@@ -22,7 +22,7 @@
                                 </thead>
                                 <tbody>
                                     {% for vehicle in v_list: %}
-                                    {% if owner_id == user_id: %}
+                                    {% if vehicle.owner_id == current_user.id: %}
                                     <tr>
                                         <td>{{ vehicle.vehicle_plate }}</td>
                                         {% if vehicle.vehicle_status == True: %}

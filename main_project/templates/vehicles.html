@@ -19,11 +19,13 @@
       </thead>
       <tbody>
         {% for veh in v_list: %}
+        {% if veh.owner_id == current_user.id %}
         <tr>
           <td>{{ veh.rfid_no }}</td>
           <td>{{ veh.vehicle_type }}</td>
           <td>{{ veh.vehicle_plate }}</td>
         </tr>
+        {% endif %}
         {% endfor %}
       </tbody>
     </table>
